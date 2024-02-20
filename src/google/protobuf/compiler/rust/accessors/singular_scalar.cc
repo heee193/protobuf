@@ -52,6 +52,29 @@ void SingularScalar::InMsgImpl(Context& ctx, const FieldDescriptor& field,
                   }
                   )rs");
            }},
+          {"setter",
+           [&] {
+             ctx.Emit({}, R"rs(
+                 pub fn $field$_set(&mut self, val: $Scalar$) {
+                   unsafe { $setter_thunk$(self.raw_msg(), val) }
+                 }
+               )rs");
+           }},
+          {"setter_opt",
+           [&] {
+             if (field.has_presence()) {
+               ctx.Emit({}, R"rs(
+                  pub fn $field$_set_opt(&mut self, val: Option<$Scalar$>) {
+                    unsafe {
+                      match val {
+                        Some(val) => $setter_thunk$(self.raw_msg(), val),
+                        None => $clearer_thunk$(self.raw_msg()),
+                      }
+                    }
+                  }
+                )rs");
+             }
+           }},
           {"getter_thunk", ThunkName(ctx, field, "get")},
           {"setter_thunk", ThunkName(ctx, field, "set")},
           {"clearer_thunk", ThunkName(ctx, field, "clear")},
@@ -128,6 +151,8 @@ void SingularScalar::InMsgImpl(Context& ctx, const FieldDescriptor& field,
       R"rs(
           $getter$
           $getter_opt$
+          $setter$
+          $setter_opt$
           $vtable$
           $getter_mut$
         )rs");
