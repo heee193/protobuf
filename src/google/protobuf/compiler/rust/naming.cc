@@ -394,6 +394,26 @@ absl::string_view MultiCasePrefixStripper::StripPrefix(
   return name;
 }
 
+constexpr MapKeyType kMapKeyTypes[] = {
+    {"i32", "i32", "i32", "key", "ffi_key", "int32_t", "int32_t", "key",
+     "cpp_key"},
+    {"u32", "u32", "u32", "key", "ffi_key", "uint32_t", "uint32_t", "key",
+     "cpp_key"},
+    {"i64", "i64", "i64", "key", "ffi_key", "int64_t", "int64_t", "key",
+     "cpp_key"},
+    {"u64", "u64", "u64", "key", "ffi_key", "uint64_t", "uint64_t", "key",
+     "cpp_key"},
+    {"bool", "bool", "bool", "key", "ffi_key", "bool", "bool", "key",
+     "cpp_key"},
+    {"string", "$pb$::ProtoStr", "$pbi$::PtrAndLen", "key.as_bytes().into()",
+     "$pb$::ProtoStr::from_utf8_unchecked(ffi_key.as_ref())", "std::string",
+     "google::protobuf::rust_internal::PtrAndLen", "std::string(key.ptr, key.len)",
+     "google::protobuf::rust_internal::PtrAndLen(cpp_key.data(), cpp_key.size())"},
+    {"bytes", "[u8]", "$pbi$::PtrAndLen", "key.into()", "ffi_key.as_ref()",
+     "std::string", "google::protobuf::rust_internal::PtrAndLen",
+     "std::string(key.ptr, key.len)",
+     "google::protobuf::rust_internal::PtrAndLen(cpp_key.data(), cpp_key.size())"}};
+
 }  // namespace rust
 }  // namespace compiler
 }  // namespace protobuf
